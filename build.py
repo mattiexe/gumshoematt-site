@@ -108,7 +108,7 @@ def online_card(g):
 def offline_card(o):
     slug, name, kind, players, time, note, img, case = o
     return f'''<a class="card newsprint" href="/box.html?g={slug}" data-kind="{e(kind)}" data-score="-1" data-name="{e(name)}">
-<span class="boxwrap"><img src="{img}" alt="{e(name)}" loading="lazy"></span>
+<span class="boxwrap"><img class="bw-bg" src="{img}" alt="" aria-hidden="true" loading="lazy"><img class="bw-main" src="{img}" alt="{e(name)}" loading="lazy"></span>
 <span class="tag">{e(kind.upper())} · {e(players)} PLAYERS</span><span class="name">{e(name)}</span>
 <span class="row"><span class="score small">Not scored yet</span><span class="more">Open file →</span></span></a>'''
 
@@ -175,7 +175,7 @@ def offline():
         slug, name, kind, players, time, note, img, case = o
         cls = 'kraft' if i % 2 == 0 else 'newsprint'
         cards.append(f'''<article class="flipcard {cls}" data-i="{i}" style="z-index:{n-i}"><div class="holes">{rings}</div>
-<div class="fc-in"><div class="fc-img"><img src="{img}" alt="{e(name)}"><span class="tape">{e(kind.upper())}</span></div>
+<div class="fc-in"><div class="fc-img"><img class="fc-bg" src="{img}" alt="" aria-hidden="true"><img class="fc-main" src="{img}" alt="{e(name)}"><span class="tape">{e(kind.upper())}</span></div>
 <div class="fc-body"><span class="eyebrow dark">CASE No. {i+1:03d}</span><h2>{e(name)}</h2><p>{e(note)}</p>
 <div class="facts3"><div><span>PLAYERS</span>{e(players)}</div><div><span>TIME</span>{e(time)}</div><div><span>MY SCORE</span><b>Not scored yet</b></div></div>
 <a class="btn solid" href="/box.html?g={slug}">Open the file →</a></div></div></article>''')
