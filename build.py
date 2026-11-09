@@ -244,7 +244,8 @@ shutil.rmtree(OUT, ignore_errors=True)
 w('index.html', home()); w('online.html', online()); w('offline.html', offline())
 compact = {
  'cdn': CDN,
- 'g': [[g[0], g[1], g[2], g[3], g[4], g[5], steam[g[2]]['h'], steam[g[2]]['dev'], steam[g[2]]['rel'], steam[g[2]]['s']] for g in ONLINE],
+ 'g': [[g[0], g[1], g[2], g[3], g[4], g[5], steam[g[2]]['h'], steam[g[2]]['dev'], steam[g[2]]['rel'], steam[g[2]]['s'], steam[g[2]].get('price','')] for g in ONLINE],
+ 'checked': '9 Nov 2026',
  'b': [list(o) for o in OFFLINE]}
 w('data.js', 'window.GM=' + json.dumps(compact, separators=(',', ':'), ensure_ascii=False) + ';')
 shell = page('Gumshoematt', '{ACTIVE}', '<main id="gm-page"></main>').replace('<script src="/site.js"></script>', '<script src="/data.js"></script><script src="/site.js"></script>')
