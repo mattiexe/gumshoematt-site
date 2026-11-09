@@ -231,3 +231,7 @@ a.folder:hover,a.folder:hover *{color:#2A1F12}
 .boxwrap{position:relative;overflow:hidden;background:#1B2B26}
 .bw-main{position:relative;height:92%;max-height:none;object-fit:contain;box-shadow:0 8px 18px rgba(0,0,0,.5)}
 @media (max-width:820px){.fc-main{height:auto;max-height:260px}}
+/* folders: gentle, smooth rise on hover */
+.folder{transition:transform .7s cubic-bezier(.25,.8,.25,1),opacity .5s ease,box-shadow .6s ease}
+.folders .folder.on,.folders .folder:hover{transform:translateY(calc(var(--l) - 26px)) rotate(calc(var(--t) * .3)) scale(1.02);box-shadow:0 30px 50px rgba(0,0,0,.6)}
+.folders.active .folder:not(.on){transform:translateY(calc(var(--l) + 10px)) rotate(var(--t))}
