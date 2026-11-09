@@ -128,8 +128,8 @@ def home():
 <div class="col">
 <div class="kraft subject"><div class="tab"></div>
 <div class="subject-head"><span>SUBJECT FILE</span><span>BELGIUM</span></div>
-<div class="photo still"><span>[Photo of Matthias]</span></div>
-<div class="subject-foot"><span class="who">Matthias D.M.</span><span class="redstamp">DETECTIVE WANNABE</span></div></div>
+<div class="photo"><img src="/img/gumshoematt-desk.jpg" alt="Gumshoematt at his detective desk, on the phone"></div>
+<div class="subject-foot"><span class="who">Gumshoematt</span><span class="redstamp">DETECTIVE WANNABE</span></div></div>
 <h1>Playing detective,<br><em>or doing the work?</em></h1>
 <p class="lede">I play deduction games on screen and on the table, and I tell you which ones are worth your evening. My picks, my scores.</p>
 <p class="stats">{len(ONLINE)} online games on file · {len(OFFLINE)} on the table</p>
@@ -143,11 +143,7 @@ def home():
 </section>
 <section class="band"><div class="wrap split">
 <div class="intro"><span class="eyebrow">CASE LOG</span><h2 class="big">Latest updates</h2><p class="muted">What I played, what I scored, what got added to the files.</p></div>
-<div class="log newsprint">{log}</div></div></section>
-<section class="wrap doors">
-<a class="door kraft" href="/offline.html"><span class="eyebrow dark">FILE A · ON THE TABLE</span><span class="door-title">Offline games</span><span>Box cases, murder mysteries, party deduction. Every one I've played. →</span></a>
-<a class="door newsprint" href="/online.html"><span class="eyebrow dark">FILE B · ON SCREEN</span><span class="door-title">Online games</span><span>My best picks, plus every game on file. Sort it your way. →</span></a>
-</section>'''
+<div class="log newsprint">{log}</div></div></section>'''
     return page('Gumshoematt: detective games, reviewed', 'home', body)
 
 # ---------- online ----------
@@ -155,7 +151,7 @@ def online():
     top = ONLINE[:5]
     tilts = [-4, -2, 0, 2, 4]
     bgs = ''.join(f'<img class="bg" data-i="{i}" src="{hero(g[2])}" alt="" aria-hidden="true">' for i, g in enumerate(top))
-    folders = ''.join(f'''<a class="folder kraft" href="/game.html?g={g[0]}" data-i="{i}" data-name="{e(g[1])}" data-score="{sc(g[3])}" style="--t:{tilts[i]}deg;--l:{abs(i-2)*8}px;z-index:{10-abs(i-2)}"><span class="ftab">No. {i+1:03d}</span><span class="fname">{e(g[1])}</span><span class="fmore">Open file ↗</span></a>''' for i, g in enumerate(top))
+    folders = ''.join(f'''<a class="folder kraft" href="/game.html?g={g[0]}" data-i="{i}" data-name="{e(g[1])}" data-score="{sc(g[3])}" style="--t:{tilts[i]}deg;--l:{abs(i-2)*8}px;z-index:{10-abs(i-2)}"><span class="ftab">No. {i+1:03d}</span><img class="ficon" src="{banner(g[2])}" alt=""><span class="fname">{e(g[1])}</span><span class="fmore">Open file ↗</span></a>''' for i, g in enumerate(top))
     mob = ''.join(f'''<a class="mcard kraft" href="/game.html?g={g[0]}"><img src="{banner(g[2])}" alt="{e(g[1])}" loading="lazy"><span class="row"><span class="name">{e(g[1])}</span><span class="score">{sc(g[3])}</span></span></a>''' for g in top)
     cards = ''.join(online_card(g) for g in ONLINE)
     body = f'''
@@ -254,6 +250,6 @@ w('data.js', 'window.GM=' + json.dumps(compact, separators=(',', ':'), ensure_as
 shell = page('Gumshoematt', '{ACTIVE}', '<main id="gm-page"></main>').replace('<script src="/site.js"></script>', '<script src="/data.js"></script><script src="/site.js"></script>')
 w('game.html', shell.replace('{ACTIVE}', 'x').replace('<a href="/online.html">', '<a href="/online.html" class="on">'))
 w('box.html', shell.replace('{ACTIVE}', 'x').replace('<a href="/offline.html">', '<a href="/offline.html" class="on">'))
-shutil.copy(os.path.join(ROOT, 'style.css'), OUT); shutil.copy(os.path.join(ROOT, 'site.js'), OUT)
+shutil.copytree(os.path.join(ROOT, 'img'), os.path.join(OUT, 'img')); shutil.copy(os.path.join(ROOT, 'style.css'), OUT); shutil.copy(os.path.join(ROOT, 'site.js'), OUT)
 open(os.path.join(OUT, 'vercel.json'), 'w').write(json.dumps({'cleanUrls': False}))
 print('built', sum(len(f) for _, _, f in os.walk(OUT)), 'files')
