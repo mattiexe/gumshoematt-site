@@ -29,7 +29,7 @@
     function apply() {
       cards.forEach(function (c) { c.hidden = !(filter === 'All' || c.dataset.kind === filter); });
       var sorted = cards.slice().sort(function (a, b) {
-        if (sort === 'name') return a.dataset.name.localeCompare(b.dataset.name);
+        if (sort === 'name') return (a.dataset.name || '').localeCompare(b.dataset.name || '');
         return (+b.dataset.score) - (+a.dataset.score);
       });
       sorted.forEach(function (c) { grid.appendChild(c); });

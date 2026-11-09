@@ -88,7 +88,7 @@ def page(title, active, body, desc='Deduction games on screen and on the table, 
 <body><div class="grain">
 <header class="top"><nav class="wrap nav">
 <a class="logo" href="/">gumshoematt</a>
-<div class="links">{nav('/', 'Home', 'home')}{nav('/offline.html', 'Offline games', 'offline')}{nav('/online.html', 'Online games', 'online')}<a class="follow" href="https://linktr.ee/gumshoematt">Follow</a></div>
+<div class="links">{nav('/', 'Home', 'home')}{nav('/offline.html', 'Offline games', 'offline')}{nav('/online.html', 'Online games', 'online')}{nav('/demos.html', 'Free demos', 'demos')}<a class="follow" href="https://linktr.ee/gumshoematt">Follow</a></div>
 </nav></header>
 {body}
 <footer class="foot"><div class="wrap">
@@ -241,7 +241,28 @@ def w(path, text):
     p = os.path.join(OUT, path); os.makedirs(os.path.dirname(p), exist_ok=True); open(p, 'w').write(text)
 
 shutil.rmtree(OUT, ignore_errors=True)
-w('index.html', home()); w('online.html', online()); w('offline.html', offline())
+
+# Free demos: (name, steam appid of the full game, note, played: True/False)
+DEMOS = []
+
+def demos():
+    if DEMOS:
+        cards = ''.join(f'''<a class="card newsprint" href="https://store.steampowered.com/app/{d[1]}/" data-kind="{'Played' if d[3] else 'Not played yet'}" data-score="-1" data-name="{e(d[0])}">
+<img src="{CDN}{d[1]}/header.jpg" alt="{e(d[0])}" loading="lazy" class="ban">
+<span class="tag">{'PLAYED' if d[3] else 'NOT PLAYED YET'} · FREE DEMO</span><span class="name">{e(d[0])}</span>
+<span class="note">{e(d[2])}</span><span class="row"><span class="score small">Free</span><span class="more">Try it on Steam →</span></span></a>''' for d in DEMOS)
+    else:
+        cards = '<p class="empty newsprint">No demos on file yet. The first ones are on their way.</p>'
+    body = f'''
+<section class="wrap pagehead"><span class="eyebrow">FILE C · FREE TO TRY</span><h1>Free demos.</h1><p class="lede">Detective game demos you can play for free. Try the case before you buy the game.</p></section>
+<section class="band"><div class="wrap archive">
+<div><span class="eyebrow">THE ARCHIVE</span><h2 class="big">Every demo on file</h2></div>
+{filters(['All', 'Played', 'Not played yet'], [('name', 'A to Z')])}
+<p class="growing">This shelf is still growing. {len(DEMOS)} demos on file so far.</p>
+<div class="grid" data-grid>{cards}</div></div></section>'''
+    return page('Free detective game demos | Gumshoematt', 'demos', body)
+
+w('index.html', home()); w('demos.html', demos()); w('online.html', online()); w('offline.html', offline())
 compact = {
  'cdn': CDN,
  'g': [[g[0], g[1], g[2], g[3], g[4], g[5], steam[g[2]]['h'], steam[g[2]]['dev'], steam[g[2]]['rel'], steam[g[2]]['s'], steam[g[2]].get('price','')] for g in ONLINE],

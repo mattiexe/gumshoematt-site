@@ -213,3 +213,5 @@ a.folder:hover,a.folder:hover *{color:#2A1F12}
 .hero-home .head-line{margin-bottom:6px}
 @media (max-width:600px){.hero-home{gap:64px;padding-top:40px}.hero-home .subject{margin-bottom:40px}}
 .hero-home h1{font-size:clamp(40px,4.6vw,64px)}
+.card .note{font-size:15px;line-height:1.45}
+.empty{grid-column:1/-1;margin:0;padding:28px;font-family:'Special Elite',monospace;font-size:17px}
