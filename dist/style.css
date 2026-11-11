@@ -235,3 +235,11 @@ a.folder:hover,a.folder:hover *{color:#2A1F12}
 .folder{transition:transform .7s cubic-bezier(.25,.8,.25,1),opacity .5s ease,box-shadow .6s ease}
 .folders .folder.on,.folders .folder:hover{transform:translateY(calc(var(--l) - 26px)) rotate(calc(var(--t) * .3)) scale(1.02);box-shadow:0 30px 50px rgba(0,0,0,.6)}
 .folders.active .folder:not(.on){transform:translateY(calc(var(--l) + 10px)) rotate(var(--t))}
+
+/* deduction detective definition + upcoming panel */
+.dictentry{max-width:760px;margin:40px auto;padding:22px 28px;box-shadow:0 14px 30px rgba(0,0,0,.45)}
+.dictentry .dhead{margin:0 0 8px;font-family:'Old Standard TT',serif;font-size:30px;line-height:1.1}
+.dictentry .hw{font-weight:700}
+.dictentry i{margin-left:12px;font-family:'Special Elite',monospace;font-size:15px;font-style:normal;opacity:.7}
+.dictentry .def{margin:0;font-size:18px;line-height:1.5}
+div.card:hover{transform:none}

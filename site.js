@@ -87,16 +87,15 @@
   if (!isBox) {
     var g = list[idx], name = g[1], app = g[2], s = g[3], rec = g[4], base = GM.cdn + app + '/';
     document.title = name + ': review | Gumshoematt';
-    var verdict = { 'Recommended': 'RECOMMENDED', 'Not for me': 'NOT FOR ME', 'On file': 'ON FILE' }[rec];
     var rel = list.filter(function (x) { return x[0] !== g[0] && x[3] !== null; }).sort(function (a, b) { var t = s === null ? 8 : s; return Math.abs(a[3] - t) - Math.abs(b[3] - t); }).slice(0, 3);
     h = '<div class="wrap crumbs"><a href="/online.html">← Online games</a><span> / Case No. ' + no + '</span></div>' +
       '<section class="wrap gtop"><div class="gbanner"><img src="' + base + g[6] + '" alt="' + esc(name) + '"><span class="tape">CASE No. ' + no + ' · ON SCREEN<b class="tape-score"> · ' + sc(s) + '</b></span></div>' +
       '<div class="ghead"><span class="eyebrow">' + esc(g[7].toUpperCase()) + ' · ' + esc(g[8]) + '</span><h1>' + esc(name) + '</h1>' +
-      '<div class="scorecard kraft"><span class="lbl">GUMSHOE SCORE</span><span class="num">' + (s === null ? '?' : String(s).replace('.', ',')) + '<small>/10</small></span><span class="verdict">' + verdict + '</span></div></div></section>' +
+      '<div class="scorecard kraft"><span class="lbl">GUMSHOE SCORE</span><span class="num">' + (s === null ? '?' : String(s).replace('.', ',')) + '<small>/10</small></span></div></div></section>' +
       '<section class="wrap gbody"><div class="take"><span class="eyebrow">MY TAKE</span><p>' + esc(g[5]) + '</p><span class="sig">Matthias</span></div>' +
-      '<div class="facts"><div><span>DEVELOPER</span>' + esc(g[7]) + '</div><div><span>RELEASED</span>' + esc(g[8]) + '</div><div><span>MY VERDICT</span>' + esc(rec) + '</div></div>' +
+      '<div class="facts"><div><span>DEVELOPER</span>' + esc(g[7]) + '</div><div><span>RELEASED</span>' + esc(g[8]) + '</div></div>' +
       '<div><span class="eyebrow">EVIDENCE</span><div class="evidence">' + g[9].map(function (u, k) { return '<a href="' + base + u + '" target="_blank" rel="noopener"><img src="' + base + u + '" alt="' + esc(name) + ' screenshot ' + (k + 1) + '" loading="lazy"></a>'; }).join('') + '</div></div>' +
-      '<div class="btns"><a class="btn solid light" href="https://store.steampowered.com/app/' + app + '/">Get it on Steam' + (g[10] ? ' · ' + g[10] : '') + ' →</a><a class="btn ghost" href="https://store.steampowered.com/curator/46277857/">Follow my Steam curator page</a></div>' + (g[10] ? '<p class="pricenote">Steam price in Belgium, checked ' + GM.checked + '. Sales change it.</p>' : '') + '</section>' +
+      '<div class="btns"><a class="btn solid light" href="https://store.steampowered.com/app/' + app + '/">Get it on Steam' + (g[10] ? ' · ' + g[10] : '') + ' →</a></div></section>' +
       '<section class="band"><div class="wrap archive"><h2 class="mid">Related cases</h2><div class="grid">' + rel.map(function (x) { return '<a class="card newsprint" href="/game.html?g=' + x[0] + '"><img src="' + GM.cdn + x[2] + '/' + x[6] + '" alt="' + esc(x[1]) + '" loading="lazy" class="ban"><span class="row"><span class="name">' + esc(x[1]) + '</span><span class="score">' + sc(x[3]) + '</span></span></a>'; }).join('') + '</div></div></section>';
   } else {
     var o = list[idx];

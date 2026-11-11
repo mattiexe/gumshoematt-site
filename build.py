@@ -33,10 +33,24 @@ ONLINE = [
      "A game where you are the murderer and have to get away with it. It wasn't really my forte. Replaying the game to find other options didn't suit me, I wanted to see a 'reverse time' mechanic."),
     ('the-diary', 'The Diary', '2343880', 5, 'Not for me',
      "You don't need a lot of deductive reasoning in this game. The diary is the main piece of content you interact with. It has this cozy cutout feeling to it, but it's not really detective material."),
-    ('the-roottrees-are-dead', 'The Roottrees are Dead', '2754380', None, 'On file',
-     "You search for information on an in-game web browser to fill in a giant family tree. This game is no walk in the park, I couldn't complete it without looking at hints online."),
+    ('the-roottrees-are-dead', 'The Roottrees are Dead', '2754380', 8.5, 'Recommended',
+     "You search for information on an in-game web browser to fill in a giant family tree. This game is no walk in the park, I couldn't complete it without looking at hints online. Still a very good game with a lot of secrets, and big enough for a real detective mind. Completing the whole game can be hard, but it's worth playing."),
 ]
 HERO = {'753640', '653530', '3641000', '2637990', '2716400'}
+
+# Games that carry the "Deduction Detective" tag
+DETECTIVE = {'outer-wilds', 'return-of-the-obra-dinn', 'the-incident-at-galley-house', 'duck-detective-the-secret-salami',
+             'the-rise-of-the-golden-idol', 'the-case-of-the-golden-idol', 'duck-detective-the-ghost-of-glamping',
+             'unheard', 'the-roottrees-are-dead'}
+
+# Not played yet: (name, steam appid, header path). Shown as "Under investigation", no page.
+UPCOMING_ON = [
+    ('Funeral for the Sun', '4088360', '4133ea3727c30395a6f6c6d3ed94eee63319650e/header.jpg?t=1794138405'),
+    ('Mystery of the Malign', '3521490', '76b89c86bb472699e202f4cf99fdf656b03b5008/header.jpg?t=1793361798'),
+    ('Psycho-Sleuth', '3432860', '33e3be2e4a8757667a6d1faa894ab7ec954c6c01/header.jpg?t=1793883448'),
+    ('Legion Was Here', '3492120', '2d1de35b4953a8fe26bbbe6d6f22b83f2e271549/header.jpg?t=1788930612'),
+]
+UPCOMING_OFF = []  # offline games still to play; the panel stays hidden while this is empty
 
 BGG = 'https://cf.geekdo-images.com/'
 OFFLINE = [
@@ -63,7 +77,7 @@ LOG = [
     ('29 Aug 2026', 'Online', 'Reviewed Shadows of Doubt. 6,5/10, not for me.', '/game.html?g=shadows-of-doubt'),
     ('29 Aug 2026', 'Online', 'Reviewed Duck Detective: The Ghost of Glamping. 7,5/10.', '/game.html?g=duck-detective-the-ghost-of-glamping'),
     ('22 Nov 2025', 'Offline', 'Case 05: Dead of Winter.', '/box.html?g=dead-of-winter'),
-    ('16 Nov 2025', 'Online', 'Case 04: The Roottrees are Dead.', '/game.html?g=the-roottrees-are-dead'),
+    ('16 Nov 2025', 'Online', 'Case 04: The Roottrees are Dead. 8,5/10.', '/game.html?g=the-roottrees-are-dead'),
 ]
 
 def sc(s):
@@ -88,21 +102,24 @@ def page(title, active, body, desc='Deduction games on screen and on the table, 
 <body><div class="grain">
 <header class="top"><nav class="wrap nav">
 <a class="logo" href="/">gumshoematt</a>
-<div class="links">{nav('/', 'Home', 'home')}{nav('/offline.html', 'Offline games', 'offline')}{nav('/online.html', 'Online games', 'online')}{nav('/demos.html', 'Free demos', 'demos')}<a class="follow" href="https://linktr.ee/gumshoematt">Follow</a></div>
+<div class="links">{nav('/', 'Home', 'home')}{nav('/offline.html', 'Offline games', 'offline')}{nav('/online.html', 'Online games', 'online')}{nav('/demos.html', 'Free demos', 'demos')}<a class="follow" href="https://www.instagram.com/gumshoematt/">Follow Instagram</a></div>
 </nav></header>
 {body}
 <footer class="foot"><div class="wrap">
 <div class="foot-row"><p class="tape big">Follow the trail.</p>
-<div class="btns"><a class="btn ghost" href="https://www.instagram.com/gumshoematt/">Instagram</a><a class="btn ghost" href="https://store.steampowered.com/curator/46277857/">Steam Curator</a><a class="btn ghost" href="https://linktr.ee/gumshoematt">All links</a></div></div>
+<div class="btns"><a class="btn ghost" href="https://www.instagram.com/gumshoematt/">Instagram</a><a class="btn ghost" href="https://linktr.ee/gumshoematt">All links</a></div></div>
 <div class="foot-meta"><span>© 2026 Gumshoematt</span><span>Game images belong to their publishers. No hints, no handholding.</span></div>
 </div></footer>
 </div><script src="/site.js"></script></body></html>'''
 
 def online_card(g):
     slug, name, appid, s, rec, _ = g
-    return f'''<a class="card newsprint" href="/game.html?g={slug}" data-kind="{e(rec)}" data-score="{s if s is not None else -1}" data-name="{e(name)}">
+    det = slug in DETECTIVE
+    kind = 'Deduction Detective' if det else 'Other'
+    tag = '<span class="tag">DEDUCTION DETECTIVE</span>' if det else ''
+    return f'''<a class="card newsprint" href="/game.html?g={slug}" data-kind="{kind}" data-score="{s if s is not None else -1}" data-name="{e(name)}">
 <img src="{banner(appid)}" alt="{e(name)}" loading="lazy" class="ban">
-<span class="tag">{e(rec.upper())}</span><span class="name">{e(name)}</span>
+{tag}<span class="name">{e(name)}</span>
 <span class="row"><span class="score">{sc(s)}</span><span class="more">Open file →</span></span></a>'''
 
 def offline_card(o):
@@ -117,17 +134,32 @@ def filters(kinds, sorts):
     s = ''.join(f'<button type="button" class="sort{" on" if i == 0 else ""}" data-sort="{v}">{l}</button>' for i, (v, l) in enumerate(sorts))
     return f'<div class="filterbar"><div class="chips">{k}</div><div class="sorts"><span>Sort</span>{s}</div></div>'
 
+DICT = '''<section class="wrap dict"><div class="dictentry newsprint"><p class="dhead"><b class="hw">Deduction detective</b><i>noun</i></p><p class="def">A game that makes you think. Hints are rare, so it's up to you to collect the clues, connect the dots and find the culprit.</p></div></section>'''
+
+def up_url(u): return CDN + u[1] + '/' + u[2]
+
+def upcoming_slips(items, label):
+    if not items: return ''
+    s = ''.join(f'''<div class="slip kraft"><img src="{up_url(u)}" alt="" loading="lazy"><span class="name">{e(u[0])}</span><span class="pending">Under investigation</span></div>''' for u in items)
+    return f'<span class="eyebrow">{label}</span><div class="slips">{s}</div>'
+
+def upcoming_panel(eyebrow, title, items):
+    if not items: return ''
+    cards = ''.join(f'''<div class="card newsprint"><img src="{up_url(u)}" alt="{e(u[0])}" loading="lazy" class="ban"><span class="name">{e(u[0])}</span><span class="row"><span class="score small">Under investigation</span></span></div>''' for u in items)
+    return f'''<section class="band"><div class="wrap archive"><div><span class="eyebrow">{eyebrow}</span><h2 class="big">{e(title)}</h2></div><p class="growing">Games I'm going to play. No verdict yet.</p><div class="grid">{cards}</div></div></section>'''
+
 # ---------- home ----------
 def home():
     top3 = ONLINE[:3]
     on = ''.join(f'''<a class="slip newsprint" href="/game.html?g={g[0]}"><img src="{banner(g[2])}" alt="" loading="lazy"><span class="name">{e(g[1])}</span><span class="stamp">{sc(g[3])}</span></a>''' for g in top3)
     off = ''.join(f'''<a class="slip kraft" href="/box.html?g={o[0]}"><img src="{o[6]}" alt="" loading="lazy" class="boxthumb"><span class="name">{e(o[1])}</span><span class="pending">Not scored yet</span></a>''' for o in OFFLINE[:2])
+    up_home = upcoming_slips(UPCOMING_ON, 'WAITING IN EVIDENCE')
     log = ''.join(f'''<a class="logrow" href="{h}"><span class="date">{d}</span><span class="pill">{k.upper()}</span><span class="txt">{e(t)}</span><span class="more">Open →</span></a>''' for d, k, t, h in LOG)
     body = f'''
 <section class="wrap hero-home">
 <div class="col">
 <div class="kraft subject"><div class="tab"></div>
-<div class="subject-head"><span>SUBJECT FILE</span><span>BELGIUM</span></div>
+<div class="subject-head"><span>SUBJECT FILE</span></div>
 <div class="photo"><img src="/img/gumshoematt-desk.jpg" alt="Gumshoematt at his detective desk, on the phone"></div>
 <div class="subject-foot"><span class="who">Gumshoematt</span><span class="redstamp">DETECTIVE WANNABE</span></div></div>
 <h1>Playing detective,<br><em>or doing the work?</em></h1>
@@ -138,6 +170,7 @@ def home():
 <div class="head-line"><h2>Start here</h2><span>The best of both worlds</span></div>
 <span class="eyebrow">ON SCREEN</span><div class="slips">{on}</div>
 <span class="eyebrow">ON THE TABLE</span><div class="slips">{off}</div>
+{up_home}
 <div class="legend newsprint"><strong>How I score</strong><span>9–10 must play</span><span>7–8 worth your evening</span><span>6 or lower: not for me</span></div>
 </div>
 </section>
@@ -154,16 +187,19 @@ def online():
     folders = ''.join(f'''<a class="folder kraft" href="/game.html?g={g[0]}" data-i="{i}" data-name="{e(g[1])}" data-score="{sc(g[3])}" style="--t:{tilts[i]}deg;--l:{abs(i-2)*8}px;z-index:{10-abs(i-2)}"><span class="ftab">No. {i+1:03d}</span><img class="ficon" src="{banner(g[2])}" alt=""><span class="fname">{e(g[1])}</span><span class="fmore">Open file ↗</span></a>''' for i, g in enumerate(top))
     mob = ''.join(f'''<a class="mcard kraft" href="/game.html?g={g[0]}"><img src="{banner(g[2])}" alt="{e(g[1])}" loading="lazy"><span class="row"><span class="name">{e(g[1])}</span><span class="score">{sc(g[3])}</span></span></a>''' for g in top)
     cards = ''.join(online_card(g) for g in ONLINE)
+    panel = upcoming_panel('UPCOMING · ON SCREEN', 'Waiting in evidence', UPCOMING_ON)
     body = f'''
 <section class="files-hero desk">{bgs}<div class="shade"></div>
 <div class="wrap fh-inner"><div class="fh-text"><span class="eyebrow" id="fh-eyebrow">FILE B · ON SCREEN</span><h1 id="fh-title">The best on file.</h1><span class="fh-score" id="fh-score"></span></div>
 <div class="folders">{folders}</div></div></section>
 <section class="wrap mob mlist"><span class="eyebrow">FILE B · ON SCREEN</span><h1>The best on file.</h1>{mob}</section>
+{DICT}
 <section class="band"><div class="wrap archive">
 <div><span class="eyebrow">THE ARCHIVE</span><h2 class="big">Every game on file</h2></div>
-{filters(['All', 'Recommended', 'Not for me'], [('score', 'Score'), ('name', 'A to Z')])}
+{filters(['All', 'Deduction Detective'], [('score', 'Score'), ('name', 'A to Z')])}
 <p class="growing">This shelf is still growing. {len(ONLINE)} games on file so far.</p>
-<div class="grid" data-grid>{cards}</div></div></section>'''
+<div class="grid" data-grid>{cards}</div></div></section>
+{panel}'''
     return page('Online detective games | Gumshoematt', 'online', body)
 
 # ---------- offline ----------
@@ -180,6 +216,7 @@ def offline():
 <div class="facts3"><div><span>PLAYERS</span>{e(players)}</div><div><span>TIME</span>{e(time)}</div><div><span>MY SCORE</span><b>Not scored yet</b></div></div>
 <a class="btn solid" href="/box.html?g={slug}">Open the file →</a></div></div></article>''')
     grid = ''.join(offline_card(o) for o in OFFLINE)
+    panel = upcoming_panel('UPCOMING · ON THE TABLE', 'Next on the desk', UPCOMING_OFF)
     body = f'''
 <section class="wrap pagehead"><span class="eyebrow">FILE A · ON THE TABLE</span><h1>The best on the table.</h1><p class="lede">Box cases, murder mysteries and party deduction I'd put on your table first. Flip through the stack.</p></section>
 <section class="wrap stackwrap">
@@ -191,7 +228,8 @@ def offline():
 <div><span class="eyebrow">THE ARCHIVE</span><h2 class="big">Every game on file</h2></div>
 {filters(['All', 'Box case', 'Party', 'Board game'], [('name', 'A to Z')])}
 <p class="growing">This shelf is still growing. {len(OFFLINE)} games on file so far.</p>
-<div class="grid" data-grid>{grid}</div></div></section>'''
+<div class="grid" data-grid>{grid}</div></div></section>
+{panel}'''
     return page('Offline detective games | Gumshoematt', 'offline', body)
 
 # ---------- game pages ----------
