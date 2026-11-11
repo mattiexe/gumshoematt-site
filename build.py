@@ -49,6 +49,9 @@ UPCOMING_ON = [
     ('Mystery of the Malign', '3521490', '76b89c86bb472699e202f4cf99fdf656b03b5008/header.jpg?t=1793361798'),
     ('Psycho-Sleuth', '3432860', '33e3be2e4a8757667a6d1faa894ab7ec954c6c01/header.jpg?t=1793883448'),
     ('Legion Was Here', '3492120', '2d1de35b4953a8fe26bbbe6d6f22b83f2e271549/header.jpg?t=1788930612'),
+    ('Detective Grimoire', '272600', 'header.jpg?t=1771579460'),
+    ('The Operator', '1771980', 'header.jpg'),
+    ('Murdered: Soul Suspect', '233290', 'header.jpg'),
 ]
 UPCOMING_OFF = []  # offline games still to play; the panel stays hidden while this is empty
 
@@ -96,13 +99,13 @@ def page(title, active, body, desc='Deduction games on screen and on the table, 
         cls = ' class="on"' if key == active else ''
         return f'<a href="{href}"{cls}>{label}</a>'
     return f'''<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0E1A16"><meta name="color-scheme" content="dark">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}">
 {FONTS}<link rel="stylesheet" href="/style.css"></head>
 <body><div class="grain">
 <header class="top"><nav class="wrap nav">
 <a class="logo" href="/">gumshoematt</a>
-<div class="links">{nav('/', 'Home', 'home')}{nav('/offline.html', 'Offline games', 'offline')}{nav('/online.html', 'Online games', 'online')}{nav('/demos.html', 'Free demos', 'demos')}<a class="follow" href="https://www.instagram.com/gumshoematt/">Follow Instagram</a></div>
+<div class="links">{nav('/', 'Home', 'home')}{nav('/offline.html', 'Offline games', 'offline')}{nav('/online.html', 'Online games', 'online')}<a class="follow" href="https://www.instagram.com/gumshoematt/">Follow Instagram</a></div>
 </nav></header>
 {body}
 <footer class="foot"><div class="wrap">
@@ -126,8 +129,8 @@ def offline_card(o):
     slug, name, kind, players, time, note, img, case = o
     return f'''<a class="card newsprint" href="/box.html?g={slug}" data-kind="{e(kind)}" data-score="-1" data-name="{e(name)}">
 <span class="boxwrap"><img class="bw-bg" src="{img}" alt="" aria-hidden="true" loading="lazy"><img class="bw-main" src="{img}" alt="{e(name)}" loading="lazy"></span>
-<span class="tag">{e(kind.upper())} · {e(players)} PLAYERS</span><span class="name">{e(name)}</span>
-<span class="row"><span class="score small">Not scored yet</span><span class="more">Open file →</span></span></a>'''
+<span class="tag">{e(kind.upper())} · {e(players)} PLAYERS</span>
+<span class="row"><span class="name">{e(name)}</span><span class="score small">Not scored yet</span></span></a>'''
 
 def filters(kinds, sorts):
     k = ''.join(f'<button type="button" class="chip{" on" if i == 0 else ""}" data-filter="{e(x)}">{e(x)}</button>' for i, x in enumerate(kinds))
@@ -153,7 +156,6 @@ def home():
     top3 = ONLINE[:3]
     on = ''.join(f'''<a class="slip newsprint" href="/game.html?g={g[0]}"><img src="{banner(g[2])}" alt="" loading="lazy"><span class="name">{e(g[1])}</span><span class="stamp">{sc(g[3])}</span></a>''' for g in top3)
     off = ''.join(f'''<a class="slip kraft" href="/box.html?g={o[0]}"><img src="{o[6]}" alt="" loading="lazy" class="boxthumb"><span class="name">{e(o[1])}</span><span class="pending">Not scored yet</span></a>''' for o in OFFLINE[:2])
-    up_home = upcoming_slips(UPCOMING_ON, 'WAITING IN EVIDENCE')
     log = ''.join(f'''<a class="logrow" href="{h}"><span class="date">{d}</span><span class="pill">{k.upper()}</span><span class="txt">{e(t)}</span><span class="more">Open →</span></a>''' for d, k, t, h in LOG)
     body = f'''
 <section class="wrap hero-home">
@@ -170,7 +172,6 @@ def home():
 <div class="head-line"><h2>Start here</h2><span>The best of both worlds</span></div>
 <span class="eyebrow">ON SCREEN</span><div class="slips">{on}</div>
 <span class="eyebrow">ON THE TABLE</span><div class="slips">{off}</div>
-{up_home}
 <div class="legend newsprint"><strong>How I score</strong><span>9–10 must play</span><span>7–8 worth your evening</span><span>6 or lower: not for me</span></div>
 </div>
 </section>
@@ -204,26 +205,10 @@ def online():
 
 # ---------- offline ----------
 def offline():
-    rings = '<span></span>' * 6
-    cards = []
-    n = len(OFFLINE)
-    for i, o in enumerate(OFFLINE):
-        slug, name, kind, players, time, note, img, case = o
-        cls = 'kraft' if i % 2 == 0 else 'newsprint'
-        cards.append(f'''<article class="flipcard {cls}" data-i="{i}" style="z-index:{n-i}"><div class="holes">{rings}</div>
-<div class="fc-in"><div class="fc-img"><img class="fc-bg" src="{img}" alt="" aria-hidden="true"><img class="fc-main" src="{img}" alt="{e(name)}"><span class="tape">{e(kind.upper())}</span></div>
-<div class="fc-body"><span class="eyebrow dark">CASE No. {i+1:03d}</span><h2>{e(name)}</h2><p>{e(note)}</p>
-<div class="facts3"><div><span>PLAYERS</span>{e(players)}</div><div><span>TIME</span>{e(time)}</div><div><span>MY SCORE</span><b>Not scored yet</b></div></div>
-<a class="btn solid" href="/box.html?g={slug}">Open the file →</a></div></div></article>''')
     grid = ''.join(offline_card(o) for o in OFFLINE)
     panel = upcoming_panel('UPCOMING · ON THE TABLE', 'Next on the desk', UPCOMING_OFF)
     body = f'''
-<section class="wrap pagehead"><span class="eyebrow">FILE A · ON THE TABLE</span><h1>The best on the table.</h1><p class="lede">Box cases, murder mysteries and party deduction I'd put on your table first. Flip through the stack.</p></section>
-<section class="wrap stackwrap">
-<div class="stack-ctrl"><span id="stack-pos">File 1 of {n}</span><div><button type="button" class="btn ghost" id="prev" aria-label="Previous file">←</button><button type="button" class="btn dark" id="next">Flip →</button></div></div>
-<div class="stack" id="stack"><div class="rings">{rings}</div>{''.join(cards)}
-<div class="stack-end"><p class="tape big">That's the whole stack.</p><button type="button" class="btn ghost" id="restart">Back to the top</button></div></div>
-</section>
+<section class="wrap pagehead"><span class="eyebrow">FILE A · ON THE TABLE</span><h1>The best on the table.</h1><p class="lede">Box cases, murder mysteries and party deduction I'd put on your table first.</p></section>
 <section class="band"><div class="wrap archive">
 <div><span class="eyebrow">THE ARCHIVE</span><h2 class="big">Every game on file</h2></div>
 {filters(['All', 'Box case', 'Party', 'Board game'], [('name', 'A to Z')])}
@@ -300,7 +285,7 @@ def demos():
 <div class="grid" data-grid>{cards}</div></div></section>'''
     return page('Free detective game demos | Gumshoematt', 'demos', body)
 
-w('index.html', home()); w('demos.html', demos()); w('online.html', online()); w('offline.html', offline())
+w('index.html', home()); w('online.html', online()); w('offline.html', offline())
 compact = {
  'cdn': CDN,
  'g': [[g[0], g[1], g[2], g[3], g[4], g[5], steam[g[2]]['h'], steam[g[2]]['dev'], steam[g[2]]['rel'], steam[g[2]]['s'], steam[g[2]].get('price','')] for g in ONLINE],

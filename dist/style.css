@@ -243,3 +243,6 @@ a.folder:hover,a.folder:hover *{color:#2A1F12}
 .dictentry i{margin-left:12px;font-family:'Special Elite',monospace;font-size:15px;font-style:normal;opacity:.7}
 .dictentry .def{margin:0;font-size:18px;line-height:1.5}
 div.card:hover{transform:none}
+html{background:#0E1A16;color-scheme:dark}
+body{overscroll-behavior-y:none}
+.boxwrap{aspect-ratio:460/215}
