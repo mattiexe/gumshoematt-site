@@ -1,4 +1,11 @@
 (function () {
+  // Home: the paper slides out of the subject file (hover on desktop, scroll on touch)
+  var sw = document.getElementById('subjectwrap');
+  if (sw) {
+    if (window.matchMedia && window.matchMedia('(hover: none)').matches && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function (en) { en.forEach(function (x) { sw.classList.toggle('out', x.isIntersecting); }); }, { threshold: 0.75 }).observe(sw);
+    }
+  }
   // Online: folders change the background on hover/focus
   var folders = document.querySelector('.folders');
   if (folders) {

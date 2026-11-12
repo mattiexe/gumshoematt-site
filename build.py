@@ -53,6 +53,7 @@ UPCOMING_ON = [
     ('The Operator', '1771980', 'header.jpg'),
     ('Murdered: Soul Suspect', '233290', 'header.jpg'),
 ]
+NOW = UPCOMING_ON[3]  # currently playing: Legion Was Here (shown on the paper in the home hero)
 UPCOMING_OFF = []  # offline games still to play; the panel stays hidden while this is empty
 
 BGG = 'https://cf.geekdo-images.com/'
@@ -105,12 +106,12 @@ def page(title, active, body, desc='Deduction games on screen and on the table, 
 <body><div class="grain">
 <header class="top"><nav class="wrap nav">
 <a class="logo" href="/">gumshoematt</a>
-<div class="links">{nav('/', 'Home', 'home')}{nav('/offline.html', 'Offline games', 'offline')}{nav('/online.html', 'Online games', 'online')}<a class="follow" href="https://www.instagram.com/gumshoematt/">Follow Instagram</a></div>
+<div class="links">{nav('/', 'Home', 'home')}{nav('/online.html', 'Online games', 'online')}{nav('/offline.html', 'Offline games', 'offline')}<a class="follow" href="https://www.instagram.com/gumshoematt/">Follow Instagram</a><a class="follow" href="https://www.tiktok.com/@gumshoemattyt">Follow TikTok</a></div>
 </nav></header>
 {body}
 <footer class="foot"><div class="wrap">
 <div class="foot-row"><p class="tape big">Follow the trail.</p>
-<div class="btns"><a class="btn ghost" href="https://www.instagram.com/gumshoematt/">Instagram</a><a class="btn ghost" href="https://linktr.ee/gumshoematt">All links</a></div></div>
+<div class="btns"><a class="btn ghost" href="https://www.instagram.com/gumshoematt/">Instagram</a><a class="btn ghost" href="https://www.tiktok.com/@gumshoemattyt">TikTok</a><a class="btn ghost" href="https://linktr.ee/gumshoematt">All links</a></div></div>
 <div class="foot-meta"><span>© 2026 Gumshoematt</span><span>Game images belong to their publishers. No hints, no handholding.</span></div>
 </div></footer>
 </div><script src="/site.js"></script></body></html>'''
@@ -160,10 +161,12 @@ def home():
     body = f'''
 <section class="wrap hero-home">
 <div class="col">
+<div class="subjectwrap" id="subjectwrap" tabindex="0">
+<div class="paper newsprint" aria-label="Currently playing: {e(NOW[0])}"><img src="{up_url(NOW)}" alt="" loading="lazy"><div class="ptxt"><span class="pnow">Currently playing</span><span class="pname">{e(NOW[0])}</span></div></div>
 <div class="kraft subject"><div class="tab"></div>
 <div class="subject-head"><span>SUBJECT FILE</span></div>
 <div class="photo"><img src="/img/gumshoematt-desk.jpg" alt="Gumshoematt at his detective desk, on the phone"></div>
-<div class="subject-foot"><span class="who">Gumshoematt</span><span class="redstamp">DETECTIVE WANNABE</span></div></div>
+<div class="subject-foot"><span class="who">Gumshoematt</span><span class="redstamp">DETECTIVE WANNABE</span></div></div></div>
 <h1>Playing detective,<br><em>or doing the work?</em></h1>
 <p class="lede">I play deduction games on screen and on the table, and I tell you which ones are worth your evening. My picks, my scores.</p>
 <p class="stats">{len(ONLINE)} online games on file · {len(OFFLINE)} on the table</p>
@@ -205,10 +208,28 @@ def online():
 
 # ---------- offline ----------
 def offline():
+    rings = '<span></span>' * 6
+    cards = []
+    n = len(OFFLINE)
+    for i, o in enumerate(OFFLINE):
+        slug, name, kind, players, time, note, img, case = o
+        cls = 'kraft' if i % 2 == 0 else 'newsprint'
+        cards.append(f'''<article class="flipcard {cls}" data-i="{i}" style="z-index:{n-i}"><div class="holes">{rings}</div>
+<div class="fc-in"><div class="fc-img"><img class="fc-bg" src="{img}" alt="" aria-hidden="true"><img class="fc-main" src="{img}" alt="{e(name)}"><span class="tape">{e(kind.upper())}</span></div>
+<div class="fc-body"><span class="eyebrow dark">CASE No. {i+1:03d}</span><h2>{e(name)}</h2><p>{e(note)}</p>
+<div class="facts3"><div><span>PLAYERS</span>{e(players)}</div><div><span>TIME</span>{e(time)}</div><div><span>MY SCORE</span><b>Not scored yet</b></div></div>
+<a class="btn solid" href="/box.html?g={slug}">Open the file →</a></div></div></article>''')
+    mob = ''.join(f'''<a class="mcard kraft" href="/box.html?g={o[0]}"><span class="boxwrap"><img class="bw-bg" src="{o[6]}" alt="" aria-hidden="true" loading="lazy"><img class="bw-main" src="{o[6]}" alt="{e(o[1])}" loading="lazy"></span><span class="row"><span class="name">{e(o[1])}</span><span class="score small">Not scored yet</span></span></a>''' for o in OFFLINE)
     grid = ''.join(offline_card(o) for o in OFFLINE)
     panel = upcoming_panel('UPCOMING · ON THE TABLE', 'Next on the desk', UPCOMING_OFF)
     body = f'''
-<section class="wrap pagehead"><span class="eyebrow">FILE A · ON THE TABLE</span><h1>The best on the table.</h1><p class="lede">Box cases, murder mysteries and party deduction I'd put on your table first.</p></section>
+<section class="wrap pagehead desk"><span class="eyebrow">FILE A · ON THE TABLE</span><h1>The best on the table.</h1><p class="lede">Box cases, murder mysteries and party deduction I'd put on your table first. Flip through the stack.</p></section>
+<section class="wrap stackwrap desk">
+<div class="stack-ctrl"><span id="stack-pos">File 1 of {n}</span><div><button type="button" class="btn ghost" id="prev" aria-label="Previous file">←</button><button type="button" class="btn dark" id="next">Flip →</button></div></div>
+<div class="stack" id="stack"><div class="rings">{rings}</div>{''.join(cards)}
+<div class="stack-end"><p class="tape big">That's the whole stack.</p><button type="button" class="btn ghost" id="restart">Back to the top</button></div></div>
+</section>
+<section class="wrap mob mlist"><span class="eyebrow">FILE A · ON THE TABLE</span><h1>The best on the table.</h1>{mob}</section>
 <section class="band"><div class="wrap archive">
 <div><span class="eyebrow">THE ARCHIVE</span><h2 class="big">Every game on file</h2></div>
 {filters(['All', 'Box case', 'Party', 'Board game'], [('name', 'A to Z')])}
