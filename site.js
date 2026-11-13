@@ -89,6 +89,17 @@
   var isBox = location.pathname.indexOf('box') > -1;
   var list = isBox ? GM.b : GM.g;
   var idx = -1; list.forEach(function (x, i) { if (x[0] === slug) idx = i; });
+  if (idx < 0 && !isBox && GM.now && slug === GM.now[0]) {
+    var n = GM.now, nb = GM.cdn + n[2] + '/' + n[3];
+    document.title = n[1] + ' | Gumshoematt';
+    host.innerHTML = '<div class="wrap crumbs"><a href="/online.html">← Online games</a><span> / Currently playing</span></div>' +
+      '<section class="wrap gtop"><div class="gbanner"><img src="' + nb + '" alt="' + esc(n[1]) + '"><span class="tape">CURRENTLY PLAYING · ON SCREEN</span></div>' +
+      '<div class="ghead"><span class="eyebrow">UNDER INVESTIGATION</span><h1>' + esc(n[1]) + '</h1>' +
+      '<div class="scorecard kraft"><span class="lbl">GUMSHOE SCORE</span><span class="num pend">Not scored yet</span></div></div></section>' +
+      '<section class="wrap gbody"><div class="take"><span class="eyebrow">MY TAKE</span><p>I\'m playing this one right now. No verdict yet.</p><span class="sig">Matthias</span></div>' +
+      '<div class="btns"><a class="btn solid light" href="https://store.steampowered.com/app/' + n[2] + '/">See it on Steam →</a></div></section>';
+    return;
+  }
   if (idx < 0) { host.innerHTML = '<section class="wrap pagehead"><h1>Case not found.</h1><p class="lede"><a href="/">Back to the files</a></p></section>'; return; }
   var no = String(idx + 1).padStart(3, '0'), h = '';
   if (!isBox) {
@@ -116,4 +127,25 @@
       '<section class="band"><div class="wrap archive"><h2 class="mid">More on the table</h2><div class="grid">' + list.filter(function (x) { return x[0] !== o[0]; }).map(function (x) { return '<a class="card newsprint" href="/box.html?g=' + x[0] + '"><span class="boxwrap"><img class="bw-bg" src="' + x[6] + '" alt="" aria-hidden="true" loading="lazy"><img class="bw-main" src="' + x[6] + '" alt="' + esc(x[1]) + '" loading="lazy"></span><span class="tag">' + esc(x[2].toUpperCase()) + '</span><span class="name">' + esc(x[1]) + '</span><span class="row"><span class="score small">Not scored yet</span><span class="more">Open file →</span></span></a>'; }).join('') + '</div></div></section>';
   }
   host.innerHTML = h;
+})();
+
+(function () {
+  var f = document.getElementById('sform');
+  if (!f) return;
+  var msg = document.getElementById('smsg'), btn = document.getElementById('sbtn');
+  f.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var d = new FormData(f), data = { name: d.get('name'), email: d.get('email'), suggestion: d.get('suggestion'), website: d.get('website'), token: d.get('cf-turnstile-response') };
+    if (!String(data.name || '').trim() || !/^\S+@\S+\.\S+$/.test(data.email || '') || !String(data.suggestion || '').trim()) { msg.textContent = 'Fill in your name, a valid email and your suggestion.'; return; }
+    if (!data.token) { msg.textContent = 'Please complete the captcha first.'; return; }
+    btn.disabled = true; msg.textContent = 'Sending...';
+    fetch('/api/suggest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (x) {
+        if (x.ok) { f.reset(); msg.textContent = 'Thanks! Your suggestion is on my desk.'; }
+        else { msg.textContent = x.j.error || 'Something went wrong. Try again later.'; btn.disabled = false; }
+        if (window.turnstile) window.turnstile.reset();
+      })
+      .catch(function () { msg.textContent = 'Could not send. Try again later.'; btn.disabled = false; });
+  });
 })();

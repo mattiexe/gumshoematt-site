@@ -53,6 +53,8 @@ UPCOMING_ON = [
     ('The Operator', '1771980', 'header.jpg'),
     ('Murdered: Soul Suspect', '233290', 'header.jpg'),
 ]
+TURNSTILE_SITEKEY = ''  # public Cloudflare Turnstile site key; the suggestions form stays closed while this is empty
+NOW_SLUG = 'legion-was-here'
 NOW = UPCOMING_ON[3]  # currently playing: Legion Was Here (shown on the paper in the home hero)
 UPCOMING_OFF = []  # offline games still to play; the panel stays hidden while this is empty
 
@@ -106,7 +108,7 @@ def page(title, active, body, desc='Deduction games on screen and on the table, 
 <body><div class="grain">
 <header class="top"><nav class="wrap nav">
 <a class="logo" href="/">gumshoematt</a>
-<div class="links">{nav('/', 'Home', 'home')}{nav('/online.html', 'Online games', 'online')}{nav('/offline.html', 'Offline games', 'offline')}<a class="follow" href="https://www.instagram.com/gumshoematt/">Follow Instagram</a><a class="follow" href="https://www.tiktok.com/@gumshoemattyt">Follow TikTok</a></div>
+<div class="links">{nav('/', 'Home', 'home')}{nav('/online.html', 'Online games', 'online')}{nav('/offline.html', 'Offline games', 'offline')}{nav('/suggest.html', 'Your suggestions', 'suggest')}<a class="follow" href="https://www.instagram.com/gumshoematt/">Follow Instagram</a><a class="follow" href="https://www.tiktok.com/@gumshoemattyt">Follow TikTok</a></div>
 </nav></header>
 {body}
 <footer class="foot"><div class="wrap">
@@ -162,7 +164,7 @@ def home():
 <section class="wrap hero-home">
 <div class="col">
 <div class="subjectwrap" id="subjectwrap" tabindex="0">
-<div class="paper newsprint" aria-label="Currently playing: {e(NOW[0])}"><img src="{up_url(NOW)}" alt="" loading="lazy"><div class="ptxt"><span class="pnow">Currently playing</span><span class="pname">{e(NOW[0])}</span></div></div>
+<a class="paper newsprint" href="/game.html?g={NOW_SLUG}" aria-label="Currently playing: {e(NOW[0])}. Open the page."><img src="{up_url(NOW)}" alt="" loading="lazy"><div class="ptxt"><span class="pnow">Currently playing</span><span class="pname">{e(NOW[0])}</span></div></a>
 <div class="kraft subject"><div class="tab"></div>
 <div class="subject-head"><span>SUBJECT FILE</span></div>
 <div class="photo"><img src="/img/gumshoematt-desk.jpg" alt="Gumshoematt at his detective desk, on the phone"></div>
@@ -188,7 +190,7 @@ def online():
     top = ONLINE[:5]
     tilts = [-4, -2, 0, 2, 4]
     bgs = ''.join(f'<img class="bg" data-i="{i}" src="{hero(g[2])}" alt="" aria-hidden="true">' for i, g in enumerate(top))
-    folders = ''.join(f'''<a class="folder kraft" href="/game.html?g={g[0]}" data-i="{i}" data-name="{e(g[1])}" data-score="{sc(g[3])}" style="--t:{tilts[i]}deg;--l:{abs(i-2)*8}px;z-index:{10-abs(i-2)}"><span class="ftab">No. {i+1:03d}</span><img class="ficon" src="{banner(g[2])}" alt=""><span class="fname">{e(g[1])}</span><span class="fmore">Open file ↗</span></a>''' for i, g in enumerate(top))
+    folders = ''.join(f'''<a class="folder" href="/game.html?g={g[0]}" data-i="{i}" data-name="{e(g[1])}" data-score="{sc(g[3])}" style="--t:{tilts[i]}deg;--l:{abs(i-2)*8}px;z-index:{10-abs(i-2)}"><span class="fcard kraft"><span class="ftab">No. {i+1:03d}</span><img class="ficon" src="{banner(g[2])}" alt=""><span class="fname">{e(g[1])}</span><span class="fmore">Open file ↗</span></span></a>''' for i, g in enumerate(top))
     mob = ''.join(f'''<a class="mcard kraft" href="/game.html?g={g[0]}"><img src="{banner(g[2])}" alt="{e(g[1])}" loading="lazy"><span class="row"><span class="name">{e(g[1])}</span><span class="score">{sc(g[3])}</span></span></a>''' for g in top)
     cards = ''.join(online_card(g) for g in ONLINE)
     panel = upcoming_panel('UPCOMING · ON SCREEN', 'Waiting in evidence', UPCOMING_ON)
@@ -237,6 +239,26 @@ def offline():
 <div class="grid" data-grid>{grid}</div></div></section>
 {panel}'''
     return page('Offline detective games | Gumshoematt', 'offline', body)
+
+# ---------- suggestions ----------
+def suggest():
+    if TURNSTILE_SITEKEY:
+        form = f'''<form id="sform" class="sform kraft" novalidate>
+<label for="s-name">YOUR NAME</label><input id="s-name" name="name" type="text" maxlength="80" autocomplete="name" required>
+<label for="s-mail">YOUR EMAIL</label><input id="s-mail" name="email" type="email" maxlength="120" autocomplete="email" required>
+<label for="s-text">YOUR SUGGESTION</label><textarea id="s-text" name="suggestion" rows="6" maxlength="2000" placeholder="A game, a box case, a party game I should play..." required></textarea>
+<div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+<div class="cf-turnstile" data-sitekey="{TURNSTILE_SITEKEY}" data-theme="light"></div>
+<p class="fine">Your name and email only go to me, so I can read your tip and reply. Nothing is posted on the site.</p>
+<p class="msg" id="smsg" role="status"></p>
+<button class="btn solid" type="submit" id="sbtn">Send suggestion</button></form>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>'''
+    else:
+        form = '<p class="empty newsprint">The suggestion box opens very soon.</p>'
+    body = f'''
+<section class="wrap pagehead"><span class="eyebrow">FILE D · YOUR TIP</span><h1>Your suggestions.</h1><p class="lede">Know a detective game I should play? Leave it here. I read every tip.</p></section>
+<section class="wrap suggestwrap">{form}</section>'''
+    return page('Your suggestions | Gumshoematt', 'suggest', body)
 
 # ---------- game pages ----------
 def game_page(i, g):
@@ -306,12 +328,13 @@ def demos():
 <div class="grid" data-grid>{cards}</div></div></section>'''
     return page('Free detective game demos | Gumshoematt', 'demos', body)
 
-w('index.html', home()); w('online.html', online()); w('offline.html', offline())
+w('index.html', home()); w('online.html', online()); w('offline.html', offline()); w('suggest.html', suggest())
 compact = {
  'cdn': CDN,
  'g': [[g[0], g[1], g[2], g[3], g[4], g[5], steam[g[2]]['h'], steam[g[2]]['dev'], steam[g[2]]['rel'], steam[g[2]]['s'], steam[g[2]].get('price','')] for g in ONLINE],
  'checked': '9 Nov 2026',
- 'b': [list(o) for o in OFFLINE]}
+ 'b': [list(o) for o in OFFLINE],
+ 'now': [NOW_SLUG, NOW[0], NOW[1], NOW[2]]}
 w('data.js', 'window.GM=' + json.dumps(compact, separators=(',', ':'), ensure_ascii=False) + ';')
 shell = page('Gumshoematt', '{ACTIVE}', '<main id="gm-page"></main>').replace('<script src="/site.js"></script>', '<script src="/data.js"></script><script src="/site.js"></script>')
 w('game.html', shell.replace('{ACTIVE}', 'x').replace('<a href="/online.html">', '<a href="/online.html" class="on">'))

@@ -102,9 +102,6 @@ h1 em{font-weight:400}
 .fh-text h1{text-shadow:0 4px 30px rgba(0,0,0,.6)}
 .fh-score{font-family:'Special Elite',monospace;font-size:22px;color:#E8A79F;min-height:30px}
 .folders{display:flex;align-items:flex-end;justify-content:center;padding-left:40px}
-.folder{position:relative;flex:0 0 210px;height:240px;margin-left:-40px;padding:30px 18px 18px;text-decoration:none;display:flex;flex-direction:column;justify-content:space-between;transform:translateY(var(--l)) rotate(var(--t));box-shadow:0 16px 32px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s ease,box-shadow .3s ease}
-.folders.active .folder{opacity:.72}
-.folders .folder.on{opacity:1;transform:translateY(-40px) rotate(0);z-index:20!important;box-shadow:0 36px 60px rgba(0,0,0,.7)}
 .ftab{position:absolute;top:-22px;left:24px;width:96px;height:24px;background:#B99258;border-radius:6px 6px 0 0;font-family:'Special Elite',monospace;font-size:13px;display:flex;align-items:center;justify-content:center}
 .fname{font-family:'Old Standard TT',serif;font-size:22px;font-weight:700;line-height:1.1}
 .fmore{font-family:'Special Elite',monospace;font-size:13px}
@@ -175,7 +172,6 @@ h1 em{font-weight:400}
 .photo{padding:0;overflow:hidden}
 .photo img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block}
 .ficon{display:block;width:100%;aspect-ratio:460/215;object-fit:cover;margin:4px 0 8px;box-shadow:0 4px 10px rgba(0,0,0,.35)}
-.folder{height:auto;min-height:250px}
 /* hover: invert light papers to black with the same texture */
 a.newsprint,a.kraft,.logrow{transition:background-color .2s ease,color .2s ease}
 a.newsprint:hover{background-color:#0A0F0D;background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.06) 0 1px,transparent 1px 3px);color:#F1EDE0}
@@ -218,11 +214,8 @@ a.folder:hover,a.folder:hover *{color:#2A1F12}
 /* archive cards: no jump on hover */
 .card:hover{transform:none}
 /* folders: rise in on load, smoother hover */
-.folder{transition:transform .55s cubic-bezier(.22,1,.36,1),opacity .4s ease,box-shadow .45s ease;animation:folderIn .9s cubic-bezier(.22,1,.36,1) backwards}
-.folder:nth-child(1){animation-delay:.05s}.folder:nth-child(2){animation-delay:.15s}.folder:nth-child(3){animation-delay:.25s}.folder:nth-child(4){animation-delay:.35s}.folder:nth-child(5){animation-delay:.45s}
+.folder:nth-child(1) .fcard{animation-delay:.05s}.folder:nth-child(2) .fcard{animation-delay:.15s}.folder:nth-child(3) .fcard{animation-delay:.25s}.folder:nth-child(4) .fcard{animation-delay:.35s}.folder:nth-child(5) .fcard{animation-delay:.45s}
 @keyframes folderIn{from{transform:translateY(180px) rotate(var(--t));opacity:0}}
-.folders .folder.on{transform:translateY(-48px) rotate(0) scale(1.04)}
-@media (prefers-reduced-motion:reduce){.folder{animation:none;transition:none}}
 /* box art fills the frame: blurred copy behind, sharp box in front */
 .fc-img{overflow:hidden;background:#1B2B26;padding:0}
 .fc-bg,.bw-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(18px) brightness(.7) saturate(1.15);transform:scale(1.25)}
@@ -232,9 +225,6 @@ a.folder:hover,a.folder:hover *{color:#2A1F12}
 .bw-main{position:relative;height:92%;max-height:none;object-fit:contain;box-shadow:0 8px 18px rgba(0,0,0,.5)}
 @media (max-width:820px){.fc-main{height:auto;max-height:260px}}
 /* folders: gentle, smooth rise on hover */
-.folder{transition:transform .7s cubic-bezier(.25,.8,.25,1),opacity .5s ease,box-shadow .6s ease}
-.folders .folder.on,.folders .folder:hover{transform:translateY(calc(var(--l) - 26px)) rotate(calc(var(--t) * .3)) scale(1.02);box-shadow:0 30px 50px rgba(0,0,0,.6)}
-.folders.active .folder:not(.on){transform:translateY(calc(var(--l) + 10px)) rotate(var(--t))}
 
 /* deduction detective definition + upcoming panel */
 .dictentry{max-width:760px;margin:40px auto;padding:22px 28px;box-shadow:0 14px 30px rgba(0,0,0,.45)}
@@ -272,3 +262,26 @@ body{overscroll-behavior-y:none}
 
 /* desktop-only blocks stay hidden on mobile */
 @media (max-width:820px){.desk{display:none!important}}
+
+/* folders: the link stays put (steady hover area), the card inside moves smoothly */
+.folder{position:relative;flex:0 0 210px;min-height:250px;margin-left:-40px;display:block;text-decoration:none}
+.fcard{position:relative;display:flex;flex-direction:column;justify-content:space-between;height:100%;min-height:250px;padding:30px 18px 18px;transform:translateY(var(--l)) rotate(var(--t)) scale(1);box-shadow:0 16px 32px rgba(0,0,0,.5);transition:transform .9s cubic-bezier(.22,1,.36,1),opacity .6s ease,box-shadow .8s ease;animation:folderIn .9s cubic-bezier(.22,1,.36,1) backwards;will-change:transform}
+.folders.active .folder:not(.on) .fcard{opacity:.72;transform:translateY(calc(var(--l) + 10px)) rotate(var(--t)) scale(1)}
+.folders .folder.on{z-index:20!important}
+.folders .folder.on .fcard{opacity:1;transform:translateY(calc(var(--l) - 40px)) rotate(calc(var(--t) * .3)) scale(1.03);box-shadow:0 30px 50px rgba(0,0,0,.6)}
+@media (prefers-reduced-motion:reduce){.fcard{animation:none;transition:none}}
+/* suggestions */
+.paper{text-decoration:none;color:var(--paper)}
+.suggestwrap{padding-bottom:88px}
+.sform{max-width:680px;display:flex;flex-direction:column;gap:8px;padding:26px;box-shadow:0 24px 50px rgba(0,0,0,.5)}
+.sform label{font-family:'Special Elite',monospace;font-size:13px;letter-spacing:.1em;margin-top:8px}
+.sform input,.sform textarea{font:inherit;font-size:16px;color:#2A1F12;background:rgba(255,255,255,.6);border:1px solid #7A5A2A;border-radius:2px;padding:10px 12px;width:100%}
+.sform input:focus-visible,.sform textarea:focus-visible,.sform button:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.sform textarea{resize:vertical;min-height:140px}
+.sform .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.sform .cf-turnstile{margin-top:12px}
+.sform .fine{margin:8px 0 0;font-size:14px;opacity:.85}
+.sform .msg{margin:0;min-height:1.4em;font-family:'Special Elite',monospace;font-size:15px;color:var(--red)}
+.sform .btn{align-self:flex-start;cursor:pointer}
+.sform .btn:disabled{opacity:.6;cursor:wait}
+@media (max-width:600px){.links{gap:0 12px;font-size:12px}}
